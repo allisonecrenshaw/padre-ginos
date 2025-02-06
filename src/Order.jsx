@@ -9,10 +9,11 @@ const intl = new Intl.NumberFormat("en-US", {
 export default function Order() {
   const [pizzaTypes, setPizzaTypes] = useState([]);
   const [pizzaType, setPizzaType] = useState("pepperoni");
-  const [pizzaSize, setPizzaSize] = useState("medium");
+  const [pizzaSize, setPizzaSize] = useState("M");
   const [loading, setLoading] = useState(true);
 
   let price, selectedPizza;
+
   if (!loading) {
     selectedPizza = pizzaTypes.find((pizza) => pizzaType === pizza.id);
     price = intl.format(
@@ -107,12 +108,16 @@ export default function Order() {
           <button type="submit">Add to Cart</button>
         </div>
         <div className="order-pizza">
-          <Pizza
+          {
+            loading? <h1>Loading pizza...</h1> : (
+              <Pizza
             name={selectedPizza.name}
             description={selectedPizza.description}
             image={selectedPizza.image}
           />
-          <p>$13.37</p>
+            )
+          }
+          <p>Price: {price}</p>
         </div>
       </form>
     </div>
