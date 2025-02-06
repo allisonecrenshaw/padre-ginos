@@ -1,9 +1,37 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Pizza from "./Pizza";
 
+const intl = new Intl.NumberFormat("en-US", {
+  style: "currency",
+  currency: "USD",
+});
+
 export default function Order() {
+  const [pizzaTypes, setPizzaTypes] = useState([]);
   const [pizzaType, setPizzaType] = useState("pepperoni");
   const [pizzaSize, setPizzaSize] = useState("medium");
+  const [loading, setLoading] = useState(true);
+
+  let price, selectedPizza;
+  if (!loading) {
+    selectedPizza = pizzaTypes.find((pizza) => pizzaType === pizza.id);
+    price = intl.format(
+      selectedPizza.sizes ? selectedPizza.sizes[pizzaSize] : "",
+    );
+  }
+
+  async function fetchPizzaTypes() {
+    await new Promise((resolve) => setTimeout(resolve, 3000)); // remove this later, just to show you the loading state
+
+    const pizzasRes = await fetch("/api/pizzas");
+    const pizzasJson = await pizzasRes.json();
+    setPizzaTypes(pizzasJson);
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    fetchPizzaTypes();
+  }, []);
 
   /*
   Note: Can pull out arrow functions when exceeding one line
@@ -33,9 +61,11 @@ export default function Order() {
               name="pizza-type"
               value={pizzaType}
             >
-              <option value="pepperoni">The Pepperoni Pizza</option>
-              <option value="hawaiian">The Hawaiian Pizza</option>
-              <option value="big_meat">The Big Meat Pizza</option>
+              {pizzaTypes.map((pizza) => (
+                <option key={pizza.id} value={pizza.id}>
+                  {pizza.name}
+                </option>
+              ))}
             </select>
           </div>
           <div>
